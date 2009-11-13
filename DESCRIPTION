@@ -1,9 +1,9 @@
 Package: yeastRNASeq
 Title:  Yeast RNA-Seq Experimental Data from Lee et al. 2008
-Version: 0.0.1
+Version: 0.0.2
 Author: James H. Bullard
-Description: A selection of RNA-Seq data from a yeast trascriptome experiment.
-biocViews: ExperimentData, Yeast
+Description: A selection of RNA-Seq data from a yeast transcriptome experiment.
+biocViews: ExperimentData, Yeast, RNAseqData
 Maintainer: J. Bullard <bullard@stat.berkeley.edu>
 License: GPL
 Depends: R (>= 2.4)
