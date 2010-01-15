@@ -1,0 +1,30 @@
+citHeader("To cite the dataset from package 'yeastRNASeq' in publications use:")
+desc <- packageDescription("yeastRNASeq")
+year <- 2008
+vers <- paste("R package version", desc$Version)
+title <- "Novel low abundance and transient RNAs in yeast revealed by tiling microarrays and ultra high-throughput sequencing are not conserved across closely related yeast species" 
+journal <- "PLoS Genet"
+volume <- "4"
+number <- 12
+pages <- "e1000299"
+doi <- "10.1371/journal.pgen.1000299"
+url <- "http://dx.doi.org/10.1371/journal.pgen.1000299"
+citEntry(entry="article",
+         title = title,
+         author = personList(as.person("Albert Lee"),
+         as.person("Kasper D. Hansen"),
+         as.person("James Bullard"),
+         as.person("Sandrine Dudoit"),
+	 as.person("Gavin Sherlock")),
+         year = year,
+	 journal = journal,
+         volume = volume,
+         number = number,
+         pages = pages,
+	 url = url,
+         doi = doi,
+         note = vers,
+	 textVersion = 
+           paste("Albert Lee, Kasper D. Hansen, James Bullard, Sandrine Dudoit, Gavin Sherlock",
+                 " (", year, "). ", title, ". ", journal, " ", volume,
+		 "(", number, "): ", pages, "\ndoi:", doi, sep = ""))

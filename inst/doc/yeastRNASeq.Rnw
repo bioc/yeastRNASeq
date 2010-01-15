@@ -1,100 +1,108 @@
-\documentclass[letterpaper,12pt]{article}
+%\VignetteIndexEntry{An overview of yeastRNASeq}
+%\VignetteDepends{yeastRNASeq,ShortRead}
+%\VignettePackage{yeastRNASeq}
+
+\documentclass[12pt]{article}
 
 %%%%%%%%%%%%%%%%%%%%%%%% Standard Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\usepackage{epsfig}
-\usepackage{graphicx}
-\usepackage{graphics}
-\usepackage{amssymb}
-\usepackage{amsmath}
-\usepackage{mathrsfs}
-\usepackage{fancyvrb}
-\usepackage{comment}
-\usepackage{fancyhdr}
+\usepackage{times}
+\usepackage{hyperref}
 
-%%%%%%%%%%%%%%%%%%%%%%%% Adapted from Sweave %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-\DefineVerbatimEnvironment{Rcode}{Verbatim}{fontshape=sl, frame=single, 
-  framesep=2mm, fontsize=\small, baselinestretch=.5}
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%% My macros (which of course are borrowed from a million ... %%
-\def\argmax{\operatornamewithlimits{arg\,max}}
-\def\argmin{\operatornamewithlimits{arg\,min}}
-
-\usepackage{color}
-\usepackage{amsfonts}
-
-\definecolor{myblue}{rgb}{0.25, 0, 0.75}
-\definecolor{mygold}{rgb}{1,0.8,0.2}
-\definecolor{gray}{rgb}{0.5, 0.5, 0.5}
-\definecolor{lucia}{rgb}{0.8,0.4,0.7} 
-
-\newcommand{\myurl}[1]{\href{http://#1}{\textcolor{gray}{\texttt{#1}}}}
-\newcommand{\myem}[1]{\structure{#1}}
-\newcommand{\myurlshort}[2]{\href{http://#1}{\textcolor{gray}{\textsf{#2}}}}
-
-\newcommand{\RPackage}[1]{\textcolor{gray}{\textsf{#1}}}
-\newcommand{\PL}[1]{\texttt{#1}}
+\newcommand{\RPackage}[1]{\textsf{#1}}
 \newcommand{\RCode}[1]{\texttt{#1}}
+\newcommand{\RObject}[1]{\texttt{#1}}
 \newcommand{\RFunction}[1]{\textsf{#1}}
-\newcommand{\RClass}[1]{\textcolor{mygold}{\textsf{#1}}}
-\newcommand{\BIOCfunction}[1]{\textcolor{orange}{#1}}
+\newcommand{\RClass}[1]{{\textsf{#1}}}
+\SweaveOpts{eps=FALSE, echo=TRUE}
 
-%%%%%%%%%%%%%%%%%%%%%%%% Page and Document Setup %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\addtolength{\oddsidemargin}{-0.875in}
-\addtolength{\topmargin}{-0.875in}
-\addtolength{\textwidth}{1.75in}
-\addtolength{\textheight}{1.75in}
-
-\renewcommand{\topfraction}{0.9}        % max fraction of floats at top
-\renewcommand{\bottomfraction}{0.8}     % max fraction of floats at bottom
-
-% Parameters for TEXT pages (not float pages):
-\setcounter{topnumber}{2}
-\setcounter{bottomnumber}{2}
-\setcounter{totalnumber}{4}             % 2 may work better
-\setcounter{dbltopnumber}{2}            % for 2-column pages
-\renewcommand{\dbltopfraction}{0.9}     % fit big float above 2-col. text
-\renewcommand{\textfraction}{0.07}      % allow minimal text w. figs
-
-% Parameters for FLOAT pages (not text pages):
-\renewcommand{\floatpagefraction}{0.7}          % require fuller float pages
-
-% N.B.: floatpagefraction MUST be less than topfraction !!
-\renewcommand{\dblfloatpagefraction}{0.7}       % require fuller float pages
-
-
-%%%%%%%%%%%%%%%%%%%%%%% options for sweave %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\SweaveOpts{prefix.string=plots/docs, eps=FALSE, echo=FALSE}
-
-%%%%%%%%%%%%%%%%%%%%%% headers and footers %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\pagestyle{fancy} 
-\renewcommand{\footrulewidth}{\headrulewidth}
-
-%%%%%%%%%%%%%%%%%%%%%%%%% bibliography  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\bibliographystyle{plainnat}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%% Now Edit %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\fancyhead[L]{\em James Bullard}
-\fancyhead[R]{\em docs}
-\fancyfoot[L]{\em \today}
-\fancyfoot[C]{}
-\fancyfoot[R]{\em \thepage}
-
-
-%%%%%%%%%%%%%%%%%%%%%%% opening %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\title{docs}
-\author{James Bullard}
+\title{An overview of yeastRNASeq}
+\author{James Bullard and Kasper D.\ Hansen}
+\date{Modified: 15 January 2010. Compiled: \today}
 
 \begin{document}
 \maketitle
 
-There are some files available. 
+<<echo=FALSE>>=
+options(width = 65)
+@ 
+
 <<>>=
+require(yeastRNASeq)
+@ 
+
+This package contains data from
+<<>>=
+citation(package = "yeastRNASeq")
+@ 
+which describes some experiments in \emph{S.\ cerevisiae} comparing
+various mutant strains to a wild-type strain.  This package contains
+data from a wild-type and a single mutant.  For each condition
+(mutant, wild-type) there is two lanes worth of data, each lane
+containing a sample of 500,000 raw (unaligned) reads from each of 2
+lanes each.  Each of the four lanes have been aligned against the
+yeast genome using Bowtie. 
+
+The full set of raw FASTQ and Bowtie alignment files are
+<<>>=
+list.files(file.path(system.file(package = "yeastRNASeq"), "reads"))
+@ 
+These files are ready to be parsed by the tools in the \RPackage{ShortRead}
+package.  As an example we read the alignment files by
+<<>>=
+require(ShortRead)
+files <- list.files(file.path(system.file(package = "yeastRNASeq"), "reads"),
+                    pattern = "bowtie", full.names = TRUE)
+names(files) <- gsub("\\.bowtie.*", "", basename(files))
+aligned <- lapply(files, readAligned, type = "Bowtie")
+@ 
+The constructed object is a list with 4 elements.  Each element
+correspond to a lane and is an object of class \RClass{AlignedRead}.
+
+The output from this operation has already been stored as an R object
+and is accessible by
+<<>>=
+data(yeastAligned)
+@ 
+The alignment percent is
+<<>>=
+sapply(aligned, length) / 500000
+@ 
+
+There are two additional objects available in the package, purely for
+illustrative purposes (do not use them for analysis).  The object
+\RObject{yeastAnno} is annotation obtained from Ensembl using biomaRt
+and is a \RClass{data.frame} of annotation:
+<<>>=
+data(yeastAnno)
+head(yeastAnno)
+table(yeastAnno$gene_biotype)
+@ 
+The other object is called \RObject{geneLevelData} and is a
+\RClass{matrix} of counts per gene.
+<<>>=
+data(geneLevelData)
+head(geneLevelData)
+@ 
+
+\section*{Some details}
+
+The FASTQ files in the package are using the old-style (by now,
+probably deprecated) numeric qualities, instead of ASCII based qualities:
+<<>>=
+fastq <- list.files(file.path(system.file(package = "yeastRNASeq"), "reads"),
+                    pattern = "wt_1_f.fastq")
+@ 
+
+The reads were aligned to the yeast genome obtained from
+\url{ftp://ftpmips.gsf.de/yeast/sequences} (which was the basis for
+the Bowtie index available at the Bowtie website at the time of
+alignment).
+
+
+\section*{Old}
+
+There are some files available. 
+<<eval=FALSE>>=
 require(yeastRNASeq)
 files <- list.files(file.path(system.file(package = "yeastRNASeq"), "reads"), full.names = TRUE, pattern = "bowtie$")
 files
@@ -103,17 +111,17 @@ files
 Some have been aligned with bowtie. You can read these in using
 \RPackage{ShortRead}. 
 
-<<echo=TRUE>>=
+<<echo=TRUE,eval=FALSE>>=
 require(ShortRead)
 aligned <- lapply(files, function(f) readAligned(f, type = "Bowtie"))
 names(aligned) <- gsub(".fastq.bowtie", "", basename(files))
 @ 
 
-<<echo=TRUE>>=
+<<echo=TRUE,eval=FALSE>>=
 sapply(aligned, function(a) table(chromosome(a)))
 @ 
 
-<<fig=TRUE, echo=TRUE>>=
+<<fig=TRUE, echo=TRUE,eval=FALSE>>=
 a <- alphabetByCycle(sread(aligned[[1]]))
 matplot(t(a), ylab = "reads", xlab = "cycle", type = "l")
 @ 
