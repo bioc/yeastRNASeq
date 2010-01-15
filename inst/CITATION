@@ -25,6 +25,7 @@ citEntry(entry="article",
          doi = doi,
          note = vers,
 	 textVersion = 
-           paste("Albert Lee, Kasper D. Hansen, James Bullard, Sandrine Dudoit, Gavin Sherlock",
-                 " (", year, "). ", title, ". ", journal, " ", volume,
-		 "(", number, "): ", pages, "\ndoi:", doi, sep = ""))
+           c(paste("Albert Lee, Kasper D. Hansen, James Bullard, Sandrine Dudoit, Gavin Sherlock",
+                   " (", year, "). ", title, ".", sep = ""),
+             paste(journal, " ", volume, "(", number, "): ", pages, ".", sep = ""),
+             paste("doi:", doi, sep = "")))

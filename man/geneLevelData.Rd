@@ -6,20 +6,16 @@
 }
 \description{
   Gene counts for an Illumina sequencing experiment. These counts
-  represent summarizations over the data in the yeastAligned object in
-  this package.
+  represent summarizations over the data in the \code{yeastAligned}
+  object using the annotation from the \code{yeastAnno} object, both
+  from this package.
 }
 \usage{data(geneLevelData)}
-\format{
-}
-\details{
-}
 \source{
+  A citation for the dataset may be generated using
+  \code{citation("yeastRNASeq")}. 
 }
-\references{
-}
-\examples{
-data(geneLevelData)
-## maybe str(geneLevelData) ; plot(geneLevelData) ...
+\seealso{
+  The package vignette.
 }
 \keyword{datasets}

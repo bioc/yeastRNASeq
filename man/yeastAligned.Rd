@@ -13,16 +13,11 @@
   wild-type, 2 mutant lanes)
 }
 \usage{data(yeastAligned)}
-\format{
-}
-\details{
-}
 \source{
+  A citation for the dataset may be generated using
+  \code{citation("yeastRNASeq")}. 
 }
-\references{
-}
-\examples{
-data(yeastAligned)
-## maybe str(yeastAligned) ; plot(yeastAligned) ...
+\seealso{
+  The package vignette.
 }
 \keyword{datasets}

@@ -3,8 +3,6 @@
 %\VignettePackage{yeastRNASeq}
 
 \documentclass[12pt]{article}
-
-%%%%%%%%%%%%%%%%%%%%%%%% Standard Packages %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{times}
 \usepackage{hyperref}
 
@@ -14,7 +12,6 @@
 \newcommand{\RFunction}[1]{\textsf{#1}}
 \newcommand{\RClass}[1]{{\textsf{#1}}}
 \SweaveOpts{eps=FALSE, echo=TRUE}
-
 \title{An overview of yeastRNASeq}
 \author{James Bullard and Kasper D.\ Hansen}
 \date{Modified: 15 January 2010. Compiled: \today}
@@ -23,7 +20,7 @@
 \maketitle
 
 <<echo=FALSE>>=
-options(width = 65)
+options(width = 70)
 @ 
 
 <<>>=
@@ -32,20 +29,36 @@ require(yeastRNASeq)
 
 This package contains data from
 <<>>=
-citation(package = "yeastRNASeq")
+x <- citation(package = "yeastRNASeq")[[1]]
+utils:::print.citation(x, bibtex = FALSE)
 @ 
 which describes some experiments in \emph{S.\ cerevisiae} comparing
-various mutant strains to a wild-type strain.  This package contains
-data from a wild-type and a single mutant.  For each condition
-(mutant, wild-type) there is two lanes worth of data, each lane
-containing a sample of 500,000 raw (unaligned) reads from each of 2
-lanes each.  Each of the four lanes have been aligned against the
-yeast genome using Bowtie. 
+various mutant strains to a wild-type strain.  A full BibTex entry can
+be obtained by
+<<results=hide>>=
+citation("yeastRNASeq")
+@ 
 
-The full set of raw FASTQ and Bowtie alignment files are
+The subset of the data which this package contains is more
+specifically data from a wild-type and a single mutant yeast.  For
+each condition (mutant, wild-type) there is two lanes worth of data,
+each lane containing a sample of 500,000 raw (unaligned) reads from
+each of 2 lanes each.  Each of the four lanes have been aligned
+against the yeast genome using Bowtie.
+
+The raw reads are contained in 4 FASTQ files and the Bowtie alignment
+are contained in 4 Bowtie output files.  There are 500,000 reads in
+each of the FASTQ files and fewer reads in each of the Bowtie files.
+The filenames are
 <<>>=
 list.files(file.path(system.file(package = "yeastRNASeq"), "reads"))
 @ 
+
+The reads were aligned to the yeast genome obtained from
+\url{ftp://ftpmips.gsf.de/yeast/sequences} (which was the basis for
+the Bowtie index available at the Bowtie website at the time of
+alignment).
+
 These files are ready to be parsed by the tools in the \RPackage{ShortRead}
 package.  As an example we read the alignment files by
 <<>>=
@@ -53,19 +66,22 @@ require(ShortRead)
 files <- list.files(file.path(system.file(package = "yeastRNASeq"), "reads"),
                     pattern = "bowtie", full.names = TRUE)
 names(files) <- gsub("\\.bowtie.*", "", basename(files))
+names(files)
 aligned <- lapply(files, readAligned, type = "Bowtie")
 @ 
-The constructed object is a list with 4 elements.  Each element
-correspond to a lane and is an object of class \RClass{AlignedRead}.
+The constructed object \RObject{aligned} is a list with 4 elements.
+Each element correspond to a lane and is an object of class
+\RClass{AlignedRead}.
 
 The output from this operation has already been stored as an R object
 and is accessible by
 <<>>=
 data(yeastAligned)
+yeastAligned[["mut_1_f"]]
 @ 
-The alignment percent is
+The percent of aligned reads is
 <<>>=
-sapply(aligned, length) / 500000
+round(sapply(aligned, length) / 500000, 2)
 @ 
 
 There are two additional objects available in the package, purely for
@@ -74,58 +90,24 @@ illustrative purposes (do not use them for analysis).  The object
 and is a \RClass{data.frame} of annotation:
 <<>>=
 data(yeastAnno)
-head(yeastAnno)
+dim(yeastAnno)
+head(yeastAnno, n = 2)
 table(yeastAnno$gene_biotype)
 @ 
 The other object is called \RObject{geneLevelData} and is a
 \RClass{matrix} of counts per gene.
 <<>>=
 data(geneLevelData)
-head(geneLevelData)
+head(geneLevelData, n = 2)
 @ 
+Such a matrix may be constructed from \RObject{yeastAligned} and
+\RObject{yeastAnno} using either the functionality in
+the \RPackage{IRanges} and \RPackage{ShortRead} packages or by using
+the functionality of the \RPackage{Genominator} package (which also
+contains a vignette describing a simplified differential analysis of
+this dataset).
 
-\section*{Some details}
-
-The FASTQ files in the package are using the old-style (by now,
-probably deprecated) numeric qualities, instead of ASCII based qualities:
-<<>>=
-fastq <- list.files(file.path(system.file(package = "yeastRNASeq"), "reads"),
-                    pattern = "wt_1_f.fastq")
-@ 
-
-The reads were aligned to the yeast genome obtained from
-\url{ftp://ftpmips.gsf.de/yeast/sequences} (which was the basis for
-the Bowtie index available at the Bowtie website at the time of
-alignment).
-
-
-\section*{Old}
-
-There are some files available. 
-<<eval=FALSE>>=
-require(yeastRNASeq)
-files <- list.files(file.path(system.file(package = "yeastRNASeq"), "reads"), full.names = TRUE, pattern = "bowtie$")
-files
-@ 
-
-Some have been aligned with bowtie. You can read these in using
-\RPackage{ShortRead}. 
-
-<<echo=TRUE,eval=FALSE>>=
-require(ShortRead)
-aligned <- lapply(files, function(f) readAligned(f, type = "Bowtie"))
-names(aligned) <- gsub(".fastq.bowtie", "", basename(files))
-@ 
-
-<<echo=TRUE,eval=FALSE>>=
-sapply(aligned, function(a) table(chromosome(a)))
-@ 
-
-<<fig=TRUE, echo=TRUE,eval=FALSE>>=
-a <- alphabetByCycle(sread(aligned[[1]]))
-matplot(t(a), ylab = "reads", xlab = "cycle", type = "l")
-@ 
-
-
-
+Note that the data does not contain any biological replicates.  In the
+original publication this was addressed by also analyzing a set of
+tiling microarrays.
 \end{document}
