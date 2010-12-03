@@ -30,7 +30,7 @@ require(yeastRNASeq)
 This package contains data from
 <<>>=
 x <- citation(package = "yeastRNASeq")[[1]]
-utils:::print.citation(x, bibtex = FALSE)
+print(x, bibtex = FALSE)
 @ 
 which describes some experiments in \emph{S.\ cerevisiae} comparing
 various mutant strains to a wild-type strain.  A full BibTex entry can
